@@ -1,8 +1,7 @@
 ﻿"use server";
 
 import crypto from "crypto";
-import fs from "fs/promises";
-import path from "path";
+import { getStorageProvider } from "../../lib/storage";
 
 export async function encryptImage(formData: FormData) {
   try {
@@ -21,24 +20,29 @@ export async function encryptImage(formData: FormData) {
 
     const iv = crypto.randomBytes(16);
     const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
-    
+
     const encryptedData = Buffer.concat([
       cipher.update(inputBuffer),
-      cipher.final()
+      cipher.final(),
     ]);
 
     const mysteryBlob = Buffer.concat([salt, iv, encryptedData]);
 
-    const storageDir = path.join(process.cwd(), "encrypted-storage");
-    await fs.mkdir(storageDir, { recursive: true });
+    const filename = `${new Date().toISOString()}.txt`;
+    const provider = getStorageProvider();
 
-    const filename = `mystery-${Date.now()}.txt`;
-    const filePath = path.join(storageDir, filename);
-    await fs.writeFile(filePath, mysteryBlob);
+    // Process is atomic: uploadFile will throw if it fails.
+    // If it succeeds, the file is safely stored in the provider.
+    await provider.uploadFile(filename, mysteryBlob);
 
     return { success: true, filename };
   } catch (error) {
-    console.error("Encryption error:", error);
-    return { error: "Failed to encrypt image" };
+    console.error("Encryption/Upload error:", error);
+    return {
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to encrypt and upload image",
+    };
   }
 }
