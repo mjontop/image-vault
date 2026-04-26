@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { getFiles, decryptImage } from "../actions/files";
@@ -12,18 +12,17 @@ export default function VaultPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    async function loadFiles() {
+      const result = await getFiles();
+      if (result.success) {
+        setFiles(result.files || []);
+      } else {
+        setError(result.error || "Failed to load files");
+      }
+      setLoading(false);
+    }
     loadFiles();
   }, []);
-
-  async function loadFiles() {
-    const result = await getFiles();
-    if (result.success) {
-      setFiles(result.files || []);
-    } else {
-      setError(result.error || "Failed to load files");
-    }
-    setLoading(false);
-  }
 
   async function handleDecrypt(filename: string) {
     if (!password) {
@@ -47,7 +46,7 @@ export default function VaultPage() {
           <p className="text-sm text-zinc-500">Your collection of mystery blobs.</p>
         </div>
         <Link href="/" className="text-sm font-medium text-blue-600 hover:underline">
-          ← Back to Encryptor
+          ? Back to Encryptor
         </Link>
       </header>
 

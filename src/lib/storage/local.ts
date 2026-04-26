@@ -1,4 +1,4 @@
-﻿import fs from "fs/promises";
+import fs from "fs/promises";
 import path from "path";
 import { StorageProvider } from "./types";
 
@@ -23,7 +23,7 @@ export class LocalStorageProvider implements StorageProvider {
       await fs.mkdir(this.storageDir, { recursive: true });
       const files = await fs.readdir(this.storageDir);
       return files.filter((f) => f.endsWith(".txt")).reverse();
-    } catch (error) {
+    } catch {
       return [];
     }
   }

@@ -1,4 +1,12 @@
-﻿import { StorageProvider } from "./types";
+import { StorageProvider } from "./types";
+
+interface GitLabFile {
+  id: string;
+  name: string;
+  type: string;
+  path: string;
+  mode: string;
+}
 
 export class GitLabStorageProvider implements StorageProvider {
   private baseUrl: string;
@@ -75,10 +83,10 @@ export class GitLabStorageProvider implements StorageProvider {
       return [];
     }
 
-    const files = await response.json();
+    const files = (await response.json()) as GitLabFile[];
     return files
-      .filter((f: any) => f.type === "blob" && f.name.endsWith(".txt"))
-      .map((f: any) => f.name)
+      .filter((f) => f.type === "blob" && f.name.endsWith(".txt"))
+      .map((f) => f.name)
       .reverse();
   }
 
