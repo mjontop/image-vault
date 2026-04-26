@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { getFiles, decryptImage } from "../actions/files";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@core/components/ui/button";
+import { Label } from "@core/components/ui/label";
+import { Input } from "@core/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@core/components/ui/card";
+import { Skeleton } from "@core/components/ui/skeleton";
 import { toast } from "sonner";
 import { LockIcon } from "lucide-react";
 

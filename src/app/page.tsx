@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { encryptImage } from "./actions/encrypt";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@core/components/ui/button";
+import { Label } from "@core/components/ui/label";
+import { Input } from "@core/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@core/components/ui/card";
 import { toast } from "sonner";
 
 export default function Home() {
