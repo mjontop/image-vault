@@ -9,12 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { LockIcon } from "lucide-react";
 
 export default function VaultPage() {
   const [files, setFiles] = useState<string[]>([]);
   const [password, setPassword] = useState("");
   const [decryptedImages, setDecryptedImages] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [decryptingAll, setDecryptingAll] = useState(false);
 
   useEffect(() => {
     async function loadFiles() {
@@ -29,18 +31,36 @@ export default function VaultPage() {
     loadFiles();
   }, []);
 
-  async function handleDecrypt(filename: string) {
+  async function handleDecryptAll() {
     if (!password) {
       toast.error("Please enter the password first!");
       return;
     }
 
-    const result = await decryptImage(filename, password);
-    if (result.success && result.dataUrl) {
-      setDecryptedImages((prev) => ({ ...prev, [filename]: result.dataUrl as string }));
-      toast.success("Image decrypted successfully!");
+    setDecryptingAll(true);
+    const newDecrypted: Record<string, string> = {};
+    const failedFiles: string[] = [];
+
+    const results = await Promise.all(files.map((file) => decryptImage(file, password)));
+
+    results.forEach((result, index) => {
+      const file = files[index];
+      if (result.success && result.dataUrl) {
+        newDecrypted[file] = result.dataUrl as string;
+      } else {
+        failedFiles.push(file);
+      }
+    });
+
+    setDecryptedImages((prev) => ({ ...prev, ...newDecrypted }));
+    setDecryptingAll(false);
+
+    if (failedFiles.length === files.length) {
+      toast.error("Wrong password");
+    } else if (failedFiles.length > 0) {
+      toast.error(`Failed to decrypt ${failedFiles.length} image(s)`);
     } else {
-      toast.error(result.error || "Failed to decrypt. Check your password.");
+      toast.success("All images decrypted successfully!");
     }
   }
 
@@ -74,6 +94,13 @@ export default function VaultPage() {
               <p className="text-xs text-zinc-500">
                 This password will be used to unlock the images below.
               </p>
+              <Button
+                onClick={handleDecryptAll}
+                disabled={!password || decryptingAll}
+                className="w-full"
+              >
+                {decryptingAll ? "Unlocking..." : "Unlock All Images"}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -107,13 +134,6 @@ export default function VaultPage() {
               <Card key={file}>
                 <CardContent className="p-4">
                   <div className="flex flex-col gap-4">
-                    <div className="flex flex-col">
-                      <span className="truncate font-mono text-[10px] text-zinc-400">{file}</span>
-                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                        Encrypted Mystery Blob
-                      </span>
-                    </div>
-
                     {decryptedImages[file] ? (
                       <div className="relative aspect-video overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -125,9 +145,7 @@ export default function VaultPage() {
                       </div>
                     ) : (
                       <div className="flex aspect-video items-center justify-center rounded-lg border-2 border-dashed border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-800/50">
-                        <Button onClick={() => handleDecrypt(file)} size="sm">
-                          Unlock Image
-                        </Button>
+                        <LockIcon className="h-8 w-8 text-zinc-400" />
                       </div>
                     )}
                   </div>
