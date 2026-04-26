@@ -22,7 +22,7 @@ export class LocalStorageProvider implements StorageProvider {
     try {
       await fs.mkdir(this.storageDir, { recursive: true });
       const files = await fs.readdir(this.storageDir);
-      return files.filter(f => f.endsWith(".txt")).reverse();
+      return files.filter((f) => f.endsWith(".txt")).reverse();
     } catch (error) {
       return [];
     }

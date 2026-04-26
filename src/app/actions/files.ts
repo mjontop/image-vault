@@ -25,11 +25,8 @@ export async function decryptImage(filename: string, password: string) {
 
     const key = crypto.scryptSync(password, salt, 32);
     const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
-    
-    const decrypted = Buffer.concat([
-      decipher.update(encryptedData),
-      decipher.final()
-    ]);
+
+    const decrypted = Buffer.concat([decipher.update(encryptedData), decipher.final()]);
 
     const base64 = decrypted.toString("base64");
     return { success: true, dataUrl: `data:image/png;base64,${base64}` };

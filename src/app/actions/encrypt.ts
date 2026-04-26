@@ -21,10 +21,7 @@ export async function encryptImage(formData: FormData) {
     const iv = crypto.randomBytes(16);
     const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
 
-    const encryptedData = Buffer.concat([
-      cipher.update(inputBuffer),
-      cipher.final(),
-    ]);
+    const encryptedData = Buffer.concat([cipher.update(inputBuffer), cipher.final()]);
 
     const mysteryBlob = Buffer.concat([salt, iv, encryptedData]);
 
@@ -39,10 +36,7 @@ export async function encryptImage(formData: FormData) {
   } catch (error) {
     console.error("Encryption/Upload error:", error);
     return {
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to encrypt and upload image",
+      error: error instanceof Error ? error.message : "Failed to encrypt and upload image",
     };
   }
 }

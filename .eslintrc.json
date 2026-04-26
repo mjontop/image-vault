@@ -1,0 +1,37 @@
+{
+  "extends": ["next/core-web-vitals", "plugin:react/recommended"],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
+    "camelcase": [
+      "error",
+      {
+        "properties": "always",
+        "ignoreDestructuring": false
+      }
+    ],
+    "prefer-const": "error",
+    "no-var": "error",
+    "import/no-default-export": "error",
+    "no-console": "error",
+    "eol-last": "error"
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/app/**/{page,layout,not-found}.tsx",
+        "**/tailwind.config.ts",
+        "**/next.config.mjs"
+      ],
+      "rules": {
+        "import/no-default-export": "off"
+      }
+    },
+    {
+      "files": ["src/queries/**/*.ts"],
+      "rules": {
+        "camelcase": "off"
+      }
+    }
+  ]
+}

@@ -20,7 +20,7 @@ export class GitLabStorageProvider implements StorageProvider {
   async uploadFile(name: string, content: Buffer): Promise<void> {
     const filePath = encodeURIComponent(name);
     const url = `${this.baseUrl}/api/v4/projects/${this.projectId}/repository/files/${filePath}`;
-    
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -46,7 +46,7 @@ export class GitLabStorageProvider implements StorageProvider {
   async getFile(name: string): Promise<Buffer> {
     const filePath = encodeURIComponent(name);
     const url = `${this.baseUrl}/api/v4/projects/${this.projectId}/repository/files/${filePath}/raw?ref=${this.branch}`;
-    
+
     const response = await fetch(url, {
       headers: {
         "PRIVATE-TOKEN": this.token,
@@ -63,7 +63,7 @@ export class GitLabStorageProvider implements StorageProvider {
 
   async listFiles(): Promise<string[]> {
     const url = `${this.baseUrl}/api/v4/projects/${this.projectId}/repository/tree?ref=${this.branch}`;
-    
+
     const response = await fetch(url, {
       headers: {
         "PRIVATE-TOKEN": this.token,
@@ -85,7 +85,7 @@ export class GitLabStorageProvider implements StorageProvider {
   async deleteFile(name: string): Promise<void> {
     const filePath = encodeURIComponent(name);
     const url = `${this.baseUrl}/api/v4/projects/${this.projectId}/repository/files/${filePath}`;
-    
+
     const response = await fetch(url, {
       method: "DELETE",
       headers: {
