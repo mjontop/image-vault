@@ -26,7 +26,7 @@ export default function Home() {
         setFilename(result.filename || null);
       } else {
         setStatus(null);
-        toast.error(`Error: ${result.error}`);
+        toast.error(`Error: ecryption failed`);
       }
     } catch (err) {
       setStatus(null);

@@ -37,6 +37,11 @@ export default function VaultPage() {
       return;
     }
 
+    if (files.length === 0) {
+      toast.info("No files to decrypt.");
+      return;
+    }
+
     setDecryptingAll(true);
     const newDecrypted: Record<string, string> = {};
     const failedFiles: string[] = [];
@@ -56,7 +61,7 @@ export default function VaultPage() {
     setDecryptingAll(false);
 
     if (failedFiles.length === files.length) {
-      toast.error("Wrong password");
+      toast.error("Failed to decrypt any images. Check your password or file integrity.");
     } else if (failedFiles.length > 0) {
       toast.error(`Failed to decrypt ${failedFiles.length} image(s)`);
     } else {
@@ -96,7 +101,7 @@ export default function VaultPage() {
               </p>
               <Button
                 onClick={handleDecryptAll}
-                disabled={!password || decryptingAll}
+                disabled={!password || decryptingAll || files.length === 0}
                 className="w-full"
               >
                 {decryptingAll ? "Unlocking..." : "Unlock All Images"}
