@@ -73,7 +73,7 @@ export default function Home() {
             </div>
 
             <Button type="submit" className="mt-4">
-              Encrypt to Mystery File
+              Encrypt and upload
             </Button>
           </form>
         </CardContent>

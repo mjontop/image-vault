@@ -74,7 +74,6 @@ export default function VaultPage() {
       <header className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Secure Vault</h1>
-          <p className="text-sm text-zinc-500">Your collection of mystery blobs.</p>
         </div>
         <Button asChild variant="outline">
           <Link href="/">← Back to Encryptor</Link>
