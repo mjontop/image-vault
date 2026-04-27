@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const encryptedData = Buffer.concat([cipher.update(inputBuffer), cipher.final()]);
     const mysteryBlob = Buffer.concat([salt, iv, encryptedData]);
 
-    const timestamp = new Date(file.lastModified).toISOString().replace(/[:.]/g, '-');
+    const timestamp = new Date(file.lastModified).toISOString().replace(/[:.]/g, "-");
     const filename = `${timestamp}-${file.name}.txt`;
     const provider = getStorageProvider();
 

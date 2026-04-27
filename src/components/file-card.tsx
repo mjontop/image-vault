@@ -2,13 +2,7 @@
 
 import { Progress } from "@core/components/ui/progress";
 import { cn } from "@core/lib/utils";
-import {
-  Loader2,
-  X,
-  CheckCircle2,
-  AlertCircle,
-  Image as ImageIcon,
-} from "lucide-react";
+import { Loader2, X, CheckCircle2, AlertCircle, Image as ImageIcon } from "lucide-react";
 import { FileState } from "../types/file";
 import { useLazyPreview } from "../hooks/useLazyPreview";
 
@@ -22,25 +16,21 @@ export function FileCard({ fileState, onRemove, isUploading }: FileCardProps) {
   const { previewUrl, isLoading, generatePreview } = useLazyPreview(fileState);
 
   return (
-    <div className="group relative flex flex-col border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden shadow-sm hover:shadow-md transition-all">
-      <div className="aspect-square relative overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="relative aspect-square overflow-hidden bg-zinc-100 dark:bg-zinc-900">
         {previewUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={previewUrl}
-            alt="preview"
-            className="h-full w-full object-cover"
-          />
+          <img src={previewUrl} alt="preview" className="h-full w-full object-cover" />
         ) : (
           <div
-            className="h-full w-full flex items-center justify-center cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+            className="flex h-full w-full cursor-pointer items-center justify-center transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-800"
             onClick={generatePreview}
           >
             {isLoading ? (
-              <Loader2 className="h-8 w-8 text-zinc-500 animate-spin" />
+              <Loader2 className="h-8 w-8 animate-spin text-zinc-500" />
             ) : (
               <div className="text-center">
-                <ImageIcon className="h-8 w-8 text-zinc-400 mx-auto mb-1" />
+                <ImageIcon className="mx-auto mb-1 h-8 w-8 text-zinc-400" />
                 <span className="text-xs text-zinc-500">Click to preview</span>
               </div>
             )}
@@ -49,19 +39,19 @@ export function FileCard({ fileState, onRemove, isUploading }: FileCardProps) {
 
         {/* Status Overlays */}
         {fileState.status === "completed" && (
-          <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center backdrop-blur-[1px]">
+          <div className="absolute inset-0 flex items-center justify-center bg-green-500/20 backdrop-blur-[1px]">
             <CheckCircle2 className="h-10 w-10 text-white drop-shadow-md" />
           </div>
         )}
         {(fileState.status === "error-upload" || fileState.status === "error-encrypt") && (
-          <div className="absolute inset-0 bg-red-500/20 flex items-center justify-center backdrop-blur-[1px]">
+          <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 backdrop-blur-[1px]">
             <AlertCircle className="h-10 w-10 text-white drop-shadow-md" />
           </div>
         )}
         {(fileState.status === "uploading" || fileState.status === "encrypting") && (
-          <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center p-4">
-            <Loader2 className="h-8 w-8 text-white animate-spin mb-2" />
-            <span className="text-[10px] text-white font-bold uppercase tracking-wider">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 p-4">
+            <Loader2 className="mb-2 h-8 w-8 animate-spin text-white" />
+            <span className="text-[10px] font-bold tracking-wider text-white uppercase">
               {fileState.status === "uploading" ? `${fileState.progress}%` : "Encrypting"}
             </span>
           </div>
@@ -73,25 +63,30 @@ export function FileCard({ fileState, onRemove, isUploading }: FileCardProps) {
               e.stopPropagation();
               onRemove(fileState.id);
             }}
-            className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 text-white rounded-full transition-opacity md:opacity-0 group-hover:opacity-100"
+            className="absolute top-2 right-2 rounded-full bg-black/50 p-1.5 text-white transition-opacity group-hover:opacity-100 hover:bg-black/70 md:opacity-0"
           >
             <X className="h-3 w-3" />
           </button>
         )}
       </div>
 
-      <div className="p-2 space-y-1.5">
-        <p className="text-[11px] font-medium truncate text-zinc-700 dark:text-zinc-300">
+      <div className="space-y-1.5 p-2">
+        <p className="truncate text-[11px] font-medium text-zinc-700 dark:text-zinc-300">
           {fileState.file.name}
         </p>
         <div className="flex items-center justify-between">
-          <span className={cn(
-            "text-[9px] font-bold uppercase px-1.5 py-0.5 rounded",
-            fileState.status === "pending" && "bg-zinc-100 text-zinc-500 dark:bg-zinc-800",
-            fileState.status === "completed" && "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-            (fileState.status === "error-upload" || fileState.status === "error-encrypt") && "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-            (fileState.status === "uploading" || fileState.status === "encrypting") && "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-          )}>
+          <span
+            className={cn(
+              "rounded px-1.5 py-0.5 text-[9px] font-bold uppercase",
+              fileState.status === "pending" && "bg-zinc-100 text-zinc-500 dark:bg-zinc-800",
+              fileState.status === "completed" &&
+                "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+              (fileState.status === "error-upload" || fileState.status === "error-encrypt") &&
+                "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+              (fileState.status === "uploading" || fileState.status === "encrypting") &&
+                "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+            )}
+          >
             {fileState.status.replace("error-", "failed ")}
           </span>
         </div>

@@ -25,7 +25,7 @@ export function PasswordModal({
   onOpenChange,
   password,
   onPasswordChange,
-  onConfirm
+  onConfirm,
 }: PasswordModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -33,7 +33,8 @@ export function PasswordModal({
         <DialogHeader>
           <DialogTitle>Encryption Password</DialogTitle>
           <DialogDescription>
-            Enter a password to encrypt your images. This password will be required to view them later.
+            Enter a password to encrypt your images. This password will be required to view them
+            later.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
@@ -45,12 +46,16 @@ export function PasswordModal({
             onChange={(e) => onPasswordChange(e.target.value)}
             placeholder="Enter secure password"
             autoFocus
-            onKeyDown={(e) => e.key === 'Enter' && onConfirm()}
+            onKeyDown={(e) => e.key === "Enter" && onConfirm()}
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={onConfirm} className="bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900">Start Process</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={onConfirm} className="bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900">
+            Start Process
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

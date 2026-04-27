@@ -18,51 +18,61 @@ export function useDebouncedFileAddition(options: DebouncedFileAdditionOptions =
     return `${fileState.file.name}-${fileState.file.size}-${fileState.file.lastModified}`;
   }, []);
 
-  const flushPending = useCallback(function flushPending() {
-    setPendingFiles((currentPending) => {
-      if (currentPending.length === 0) {
-        timeoutRef.current = null;
-        return [];
-      }
+  const flushPending = useCallback(
+    function flushPending() {
+      setPendingFiles((currentPending) => {
+        if (currentPending.length === 0) {
+          timeoutRef.current = null;
+          return [];
+        }
 
-      const batchSize = Math.min(currentPending.length, maxBatchSize);
-      const batch = currentPending.slice(0, batchSize);
-      const remaining = currentPending.slice(batchSize);
+        const batchSize = Math.min(currentPending.length, maxBatchSize);
+        const batch = currentPending.slice(0, batchSize);
+        const remaining = currentPending.slice(batchSize);
 
-      setFiles((prev) => {
+        setFiles((prev) => {
+          const existingKeys = new Set(prev.map(getFileKey));
+          const filteredBatch = batch.filter(
+            (fileState) => !existingKeys.has(getFileKey(fileState))
+          );
+          return filteredBatch.length > 0 ? [...prev, ...filteredBatch] : prev;
+        });
+
+        if (remaining.length > 0) {
+          timeoutRef.current = setTimeout(flushPending, 10);
+        } else {
+          timeoutRef.current = null;
+        }
+
+        return remaining;
+      });
+    },
+    [maxBatchSize]
+  );
+
+  const addFiles = useCallback(
+    (newFiles: FileState[]) => {
+      setPendingFiles((prev) => {
         const existingKeys = new Set(prev.map(getFileKey));
-        const filteredBatch = batch.filter((fileState) => !existingKeys.has(getFileKey(fileState)));
-        return filteredBatch.length > 0 ? [...prev, ...filteredBatch] : prev;
+        const uniqueFiles = newFiles.filter(
+          (fileState) => !existingKeys.has(getFileKey(fileState))
+        );
+        return uniqueFiles.length > 0 ? [...prev, ...uniqueFiles] : prev;
       });
 
-      if (remaining.length > 0) {
-        timeoutRef.current = setTimeout(flushPending, 10);
-      } else {
-        timeoutRef.current = null;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
 
-      return remaining;
-    });
-  }, [maxBatchSize]);
-
-  const addFiles = useCallback((newFiles: FileState[]) => {
-    setPendingFiles((prev) => {
-      const existingKeys = new Set(prev.map(getFileKey));
-      const uniqueFiles = newFiles.filter((fileState) => !existingKeys.has(getFileKey(fileState)));
-      return uniqueFiles.length > 0 ? [...prev, ...uniqueFiles] : prev;
-    });
-
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = setTimeout(flushPending, delay);
-  }, [delay, flushPending, getFileKey]);
+      timeoutRef.current = setTimeout(flushPending, delay);
+    },
+    [delay, flushPending, getFileKey]
+  );
 
   const removeFile = useCallback((id: string) => {
-    setFiles(prev => {
-      const filtered = prev.filter(f => f.id !== id);
-      const removed = prev.find(f => f.id === id);
+    setFiles((prev) => {
+      const filtered = prev.filter((f) => f.id !== id);
+      const removed = prev.find((f) => f.id === id);
       if (removed?.previewUrl) {
         URL.revokeObjectURL(removed.previewUrl);
       }
@@ -71,8 +81,8 @@ export function useDebouncedFileAddition(options: DebouncedFileAdditionOptions =
   }, []);
 
   const clearAllFiles = useCallback(() => {
-    setFiles(prev => {
-      prev.forEach(f => {
+    setFiles((prev) => {
+      prev.forEach((f) => {
         if (f.previewUrl) URL.revokeObjectURL(f.previewUrl);
       });
       return [];
@@ -89,7 +99,7 @@ export function useDebouncedFileAddition(options: DebouncedFileAdditionOptions =
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      files.forEach(f => {
+      files.forEach((f) => {
         if (f.previewUrl) URL.revokeObjectURL(f.previewUrl);
       });
     };

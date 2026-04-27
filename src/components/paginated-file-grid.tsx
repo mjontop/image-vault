@@ -17,7 +17,7 @@ export function PaginatedFileGrid({
   files,
   onRemove,
   isUploading,
-  itemsPerPage = 60
+  itemsPerPage = 60,
 }: PaginatedFileGridProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -35,7 +35,7 @@ export function PaginatedFileGrid({
   return (
     <div className="space-y-4">
       {/* Files Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {currentFiles.map((fileState) => (
           <FileCard
             key={fileState.id + "hello" + fileState.file.name}
@@ -70,7 +70,7 @@ export function PaginatedFileGrid({
                   variant={pageNum === currentPage ? "default" : "outline"}
                   size="sm"
                   onClick={() => goToPage(pageNum)}
-                  className="w-8 h-8 p-0"
+                  className="h-8 w-8 p-0"
                 >
                   {pageNum}
                 </Button>

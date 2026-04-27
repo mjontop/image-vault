@@ -23,36 +23,43 @@ export default function Home() {
   // Use debounced file addition for performance
   const { files, addFiles, removeFile, clearAllFiles, setFiles } = useDebouncedFileAddition({
     delay: 150,
-    maxBatchSize: 50
+    maxBatchSize: 50,
   });
 
   // Use batch upload with concurrency control
   const { uploadBatch, isUploading } = useBatchUpload({
     concurrency: 3, // Upload 3 files at a time
     onProgress: (fileId, progress) => {
-      setFiles(prev => prev.map(f =>
-        f.id === fileId ? { ...f, progress, status: progress < 100 ? "uploading" : "encrypting" } : f
-      ));
+      setFiles((prev) =>
+        prev.map((f) =>
+          f.id === fileId
+            ? { ...f, progress, status: progress < 100 ? "uploading" : "encrypting" }
+            : f
+        )
+      );
     },
     onComplete: (fileId) => {
-      setFiles(prev => prev.map(f =>
-        f.id === fileId ? { ...f, progress: 100, status: "completed" } : f
-      ));
+      setFiles((prev) =>
+        prev.map((f) => (f.id === fileId ? { ...f, progress: 100, status: "completed" } : f))
+      );
     },
     onError: (fileId, error) => {
-      setFiles(prev => prev.map(f =>
-        f.id === fileId ? { ...f, status: "error-encrypt", error } : f
-      ));
-    }
+      setFiles((prev) =>
+        prev.map((f) => (f.id === fileId ? { ...f, status: "error-encrypt", error } : f))
+      );
+    },
   });
 
   const stats: Stats = useMemo(() => {
     const total = files.length;
-    const uploaded = files.filter(f => ["encrypting", "completed", "error-encrypt"].includes(f.status)).length;
-    const encrypted = files.filter(f => f.status === "completed").length;
-    const failedUpload = files.filter(f => f.status === "error-upload").length;
-    const failedEncrypt = files.filter(f => f.status === "error-encrypt").length;
-    const overallProgress = total > 0 ? (files.reduce((acc, f) => acc + f.progress, 0) / (total * 100)) * 100 : 0;
+    const uploaded = files.filter((f) =>
+      ["encrypting", "completed", "error-encrypt"].includes(f.status)
+    ).length;
+    const encrypted = files.filter((f) => f.status === "completed").length;
+    const failedUpload = files.filter((f) => f.status === "error-upload").length;
+    const failedEncrypt = files.filter((f) => f.status === "error-encrypt").length;
+    const overallProgress =
+      total > 0 ? (files.reduce((acc, f) => acc + f.progress, 0) / (total * 100)) * 100 : 0;
 
     return { total, uploaded, encrypted, failedUpload, failedEncrypt, overallProgress };
   }, [files]);
@@ -96,10 +103,10 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen flex-1 flex-col items-center bg-zinc-50 p-4 md:p-8 font-sans dark:bg-black">
-      <nav className="flex w-full max-w-6xl justify-between items-center mb-8">
+    <div className="flex min-h-screen flex-1 flex-col items-center bg-zinc-50 p-4 font-sans md:p-8 dark:bg-black">
+      <nav className="mb-8 flex w-full max-w-6xl items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="bg-zinc-900 dark:bg-zinc-100 p-1.5 rounded-lg">
+          <div className="rounded-lg bg-zinc-900 p-1.5 dark:bg-zinc-100">
             <Lock className="h-5 w-5 text-zinc-100 dark:text-zinc-900" />
           </div>
           <h1 className="text-xl font-bold tracking-tight">Image Encryptor</h1>
@@ -109,12 +116,10 @@ export default function Home() {
         </Button>
       </nav>
 
-      <Card className="w-full max-w-6xl border-none shadow-none bg-transparent">
-        <CardContent className="p-0 space-y-6">
+      <Card className="w-full max-w-6xl border-none bg-transparent shadow-none">
+        <CardContent className="space-y-6 p-0">
           {/* Global Progress Dashboard */}
-          {files.length > 0 && (
-            <ProgressDashboard stats={stats} />
-          )}
+          {files.length > 0 && <ProgressDashboard stats={stats} />}
 
           <FileDropzone
             filesCount={files.length}
@@ -126,7 +131,7 @@ export default function Home() {
             }}
             onStartUpload={startUpload}
             isUploading={isUploading}
-            allFilesCompleted={files.every(f => f.status === "completed")}
+            allFilesCompleted={files.every((f) => f.status === "completed")}
           />
 
           {/* Files Grid */}

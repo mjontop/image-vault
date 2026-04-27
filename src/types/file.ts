@@ -1,4 +1,10 @@
-export type UploadStatus = "pending" | "uploading" | "encrypting" | "completed" | "error-upload" | "error-encrypt";
+export type UploadStatus =
+  | "pending"
+  | "uploading"
+  | "encrypting"
+  | "completed"
+  | "error-upload"
+  | "error-encrypt";
 
 export interface FileState {
   id: string;
