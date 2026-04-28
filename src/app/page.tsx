@@ -111,9 +111,14 @@ export default function Home() {
           </div>
           <h1 className="text-xl font-bold tracking-tight">Image Encryptor</h1>
         </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/vault">View Vault →</Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href="/gallery">Gallery</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/vault">View Vault →</Link>
+          </Button>
+        </div>
       </nav>
 
       <Card className="w-full max-w-6xl border-none bg-transparent shadow-none">

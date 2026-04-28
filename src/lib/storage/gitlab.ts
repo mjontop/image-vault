@@ -14,9 +14,9 @@ export class GitLabStorageProvider implements StorageProvider {
   private token: string;
   private branch: string;
 
-  constructor() {
+  constructor(overrideProjectId?: string) {
     this.baseUrl = process.env.GITLAB_BASE_URL || "https://gitlab.com";
-    this.projectId = process.env.GITLAB_PROJECT_ID || "";
+    this.projectId = overrideProjectId || process.env.GITLAB_PROJECT_ID || "";
     this.token = process.env.GITLAB_TOKEN || "";
     this.branch = process.env.GITLAB_BRANCH || "main";
 
@@ -69,8 +69,8 @@ export class GitLabStorageProvider implements StorageProvider {
     return Buffer.from(arrayBuffer);
   }
 
-  async listFiles(): Promise<string[]> {
-    const url = `${this.baseUrl}/api/v4/projects/${this.projectId}/repository/tree?ref=${this.branch}`;
+  async listFiles(page: number = 1, perPage: number = 100): Promise<string[]> {
+    const url = `${this.baseUrl}/api/v4/projects/${this.projectId}/repository/tree?ref=${this.branch}&per_page=${perPage}&page=${page}`;
 
     const response = await fetch(url, {
       headers: {
