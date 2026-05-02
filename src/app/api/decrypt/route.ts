@@ -34,7 +34,10 @@ export async function POST(req: NextRequest) {
         mimeType = "image/gif";
       } else if (hex === "52494646") {
         mimeType = "image/webp";
-      } else if (decrypted.toString("utf8", 0, 4) === "<svg" || decrypted.toString("utf8", 0, 5) === "<?xml") {
+      } else if (
+        decrypted.toString("utf8", 0, 4) === "<svg" ||
+        decrypted.toString("utf8", 0, 5) === "<?xml"
+      ) {
         mimeType = "image/svg+xml";
       }
     }
@@ -47,9 +50,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Decryption API error:", error);
-    return NextResponse.json(
-      { error: "Invalid password or corrupted file" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Invalid password or corrupted file" }, { status: 401 });
   }
 }

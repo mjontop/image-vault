@@ -62,10 +62,10 @@ export function GalleryView() {
       const newFiles = result.files;
       const initialNewImages: ImageState[] = newFiles.map((name) => {
         // Filename is ISO string + extension
-        const dateStr = name.replace(".dat", "")
-       
+        const dateStr = name.replace(".dat", "");
+
         const dateTime = sanitizeCustomDateString(dateStr);
-        
+
         return {
           name,
           timestamp: new Date(dateTime),
@@ -87,10 +87,10 @@ export function GalleryView() {
     }
   };
 
-  const decryptAll =  () => {
-    const pendingImages = images.filter(img => img.status === "pending");
+  const decryptAll = () => {
+    const pendingImages = images.filter((img) => img.status === "pending");
     for (const img of pendingImages) {
-       processImage(projectId, img.name, password);
+      processImage(projectId, img.name, password);
     }
   };
 
@@ -101,21 +101,22 @@ export function GalleryView() {
   };
 
   const processImage = async (pId: string, fileName: string, pass: string) => {
-    const currentImg = images.find(img => img.name === fileName);
-    if (currentImg && (currentImg.status === "loaded" || currentImg.status === "decrypting" || currentImg.status === "loading")) {
+    const currentImg = images.find((img) => img.name === fileName);
+    if (
+      currentImg &&
+      (currentImg.status === "loaded" ||
+        currentImg.status === "decrypting" ||
+        currentImg.status === "loading")
+    ) {
       return;
     }
 
     setImages((prev) =>
-      prev.map((img) =>
-        img.name === fileName ? { ...img, status: "loading" } : img
-      )
+      prev.map((img) => (img.name === fileName ? { ...img, status: "loading" } : img))
     );
 
     setImages((prev) =>
-      prev.map((img) =>
-        img.name === fileName ? { ...img, status: "decrypting" } : img
-      )
+      prev.map((img) => (img.name === fileName ? { ...img, status: "decrypting" } : img))
     );
 
     try {
@@ -134,9 +135,7 @@ export function GalleryView() {
 
       setImages((prev) =>
         prev.map((img) =>
-          img.name === fileName
-            ? { ...img, status: "loaded", dataUrl: url }
-            : img
+          img.name === fileName ? { ...img, status: "loaded", dataUrl: url } : img
         )
       );
     } catch (error) {
@@ -169,7 +168,7 @@ export function GalleryView() {
   return (
     <div className="space-y-8">
       {images.length === 0 && (
-        <Card className="max-w-md mx-auto">
+        <Card className="mx-auto max-w-md">
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -200,10 +199,10 @@ export function GalleryView() {
       )}
 
       {images.length > 0 && (
-        <div className="flex justify-between items-center bg-background/95 backdrop-blur sticky top-0 z-20 py-4 border-b">
+        <div className="bg-background/95 sticky top-0 z-20 flex items-center justify-between border-b py-4 backdrop-blur">
           <div className="flex flex-col">
             <h2 className="text-xl font-semibold">Repository: {projectId}</h2>
-            <p className="text-xs text-muted-foreground">{images.length} images loaded</p>
+            <p className="text-muted-foreground text-xs">{images.length} images loaded</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={decryptAll}>
@@ -227,26 +226,26 @@ export function GalleryView() {
       <div className="space-y-12">
         {Object.entries(groupedImages).map(([date, imgs]) => (
           <div key={date} className="space-y-4">
-            <h3 className="text-lg font-medium sticky top-[72px] bg-background/95 backdrop-blur z-10 py-2">
+            <h3 className="bg-background/95 sticky top-[72px] z-10 py-2 text-lg font-medium backdrop-blur">
               {date}
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {imgs.map((image) => (
                 <Card
                   key={image.name}
-                  className="overflow-hidden aspect-square relative group cursor-pointer border-none shadow-none bg-muted"
+                  className="group bg-muted relative aspect-square cursor-pointer overflow-hidden border-none shadow-none"
                   onMouseEnter={() => processImage(projectId, image.name, password)}
                 >
-                  <CardContent className="p-0 h-full">
+                  <CardContent className="h-full p-0">
                     {image.status === "pending" ? (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Lock className="h-6 w-6 text-muted-foreground/40" />
+                      <div className="flex h-full w-full items-center justify-center">
+                        <Lock className="text-muted-foreground/40 h-6 w-6" />
                       </div>
                     ) : image.status === "loading" || image.status === "decrypting" ? (
-                      <div className="w-full h-full">
-                        <Skeleton className="w-full h-full absolute inset-0" />
+                      <div className="h-full w-full">
+                        <Skeleton className="absolute inset-0 h-full w-full" />
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="bg-background/80 px-2 py-1 rounded text-[10px] font-medium animate-pulse">
+                          <div className="bg-background/80 animate-pulse rounded px-2 py-1 text-[10px] font-medium">
                             {image.status === "decrypting" ? "DECRYPTING" : "LOADING"}
                           </div>
                         </div>
@@ -261,7 +260,7 @@ export function GalleryView() {
                         sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center p-2 text-destructive bg-destructive/10 text-center text-[10px]">
+                      <div className="text-destructive bg-destructive/10 flex h-full w-full items-center justify-center p-2 text-center text-[10px]">
                         Error
                       </div>
                     )}
@@ -282,7 +281,7 @@ export function GalleryView() {
       )}
 
       {!isFetchingList && images.length === 0 && (
-        <div className="text-center text-muted-foreground py-20 border-2 border-dashed rounded-lg">
+        <div className="text-muted-foreground rounded-lg border-2 border-dashed py-20 text-center">
           No images to display. Enter repository details to start.
         </div>
       )}

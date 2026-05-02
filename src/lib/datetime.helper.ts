@@ -4,10 +4,7 @@ export function sanitizeCustomDateString(dateString: string): string {
   const customIsoRegex = /T(\d{2})-(\d{2})-(\d{2})-(\d{3})Z$/;
 
   if (customIsoRegex.test(trimmedValue)) {
-    return trimmedValue.replace(
-      customIsoRegex,
-      "T$1:$2:$3.$4Z"
-    );
+    return trimmedValue.replace(customIsoRegex, "T$1:$2:$3.$4Z");
   }
 
   return trimmedValue;
@@ -26,16 +23,7 @@ export function extractDateFromString(value: string): string | null {
     return null;
   }
 
-  const [
-    ,
-    year,
-    month,
-    day,
-    hours,
-    minutes,
-    seconds,
-    milliseconds,
-  ] = matchedValue;
+  const [, year, month, day, hours, minutes, seconds, milliseconds] = matchedValue;
 
   const extractedDate = new Date(
     Number(year),
