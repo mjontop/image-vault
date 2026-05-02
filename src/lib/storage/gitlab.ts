@@ -85,7 +85,7 @@ export class GitLabStorageProvider implements StorageProvider {
 
     const files = (await response.json()) as GitLabFile[];
     return files
-      .filter((f) => f.type === "blob" && f.name.endsWith(".txt"))
+      .filter((f) => f.type === "blob" && (f.name.endsWith(".dat") || f.name.endsWith(".txt")))
       .map((f) => f.name)
       .reverse();
   }

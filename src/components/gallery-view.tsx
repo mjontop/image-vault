@@ -10,6 +10,7 @@ import { Skeleton } from "@core/components/ui/skeleton";
 import { Lock } from "lucide-react";
 import { getGalleryFiles } from "@core/app/actions/gallery";
 import { toast } from "sonner";
+import { sanitizeCustomDateString } from "@core/lib/datetime.helper";
 
 interface ImageState {
   name: string;
@@ -60,11 +61,14 @@ export function GalleryView() {
     if (result.success && result.files) {
       const newFiles = result.files;
       const initialNewImages: ImageState[] = newFiles.map((name) => {
-        // Filename is ISO string + .txt
-        const dateStr = name.replace(".txt", "");
+        // Filename is ISO string + extension
+        const dateStr = name.replace(".dat", "")
+       
+        const dateTime = sanitizeCustomDateString(dateStr);
+        
         return {
           name,
-          timestamp: new Date(dateStr),
+          timestamp: new Date(dateTime),
           status: "pending",
         };
       });
@@ -149,7 +153,6 @@ export function GalleryView() {
 
   // Group images by day
   const groupedImages = images.reduce((groups: Record<string, ImageState[]>, image) => {
-    debugger;
     const date = image.timestamp.toLocaleDateString(undefined, {
       weekday: "long",
       year: "numeric",

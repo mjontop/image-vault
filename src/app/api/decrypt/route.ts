@@ -22,18 +22,21 @@ export async function POST(req: NextRequest) {
 
     const decrypted = Buffer.concat([decipher.update(encryptedData), decipher.final()]);
 
-    // Guess MIME type from filename (filenames are stored as original-name.txt)
-    let mimeType = "image/png"; // Default to png
-    const lowerFilename = filename.toLowerCase();
-
-    if (lowerFilename.includes(".jpg") || lowerFilename.includes(".jpeg")) {
-      mimeType = "image/jpeg";
-    } else if (lowerFilename.includes(".gif")) {
-      mimeType = "image/gif";
-    } else if (lowerFilename.includes(".webp")) {
-      mimeType = "image/webp";
-    } else if (lowerFilename.includes(".svg")) {
-      mimeType = "image/svg+xml";
+    // Detect MIME type from magic bytes (since filenames no longer contain original extension)
+    let mimeType = "image/png"; // Default
+    if (decrypted.length > 4) {
+      const hex = decrypted.subarray(0, 4).toString("hex").toUpperCase();
+      if (hex.startsWith("FFD8FF")) {
+        mimeType = "image/jpeg";
+      } else if (hex === "89504E47") {
+        mimeType = "image/png";
+      } else if (hex.startsWith("474946")) {
+        mimeType = "image/gif";
+      } else if (hex === "52494646") {
+        mimeType = "image/webp";
+      } else if (decrypted.toString("utf8", 0, 4) === "<svg" || decrypted.toString("utf8", 0, 5) === "<?xml") {
+        mimeType = "image/svg+xml";
+      }
     }
 
     return new NextResponse(decrypted, {
