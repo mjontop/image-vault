@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { getStorageProvider } from "@core/lib/storage";
+import { extractDateFromString } from "@core/lib/datetime.helper";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,8 +28,14 @@ export async function POST(req: NextRequest) {
     const encryptedData = Buffer.concat([cipher.update(inputBuffer), cipher.final()]);
     const mysteryBlob = Buffer.concat([salt, iv, encryptedData]);
 
-    const timestamp = new Date(file.lastModified).toISOString().replace(/[:.]/g, "-");
-    const filename = `${timestamp}-${file.name}.txt`;
+
+    let timestamp = extractDateFromString(file.name) 
+
+    if(!timestamp) {
+      timestamp = new Date(file.lastModified).toISOString().replace(/[:.]/g, "-");
+    }
+
+    const filename = `${timestamp}.dat`;
     const provider = getStorageProvider();
 
     await provider.uploadFile(filename, mysteryBlob);
