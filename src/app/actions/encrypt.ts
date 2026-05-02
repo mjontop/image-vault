@@ -25,7 +25,8 @@ export async function encryptImage(formData: FormData) {
 
     const mysteryBlob = Buffer.concat([salt, iv, encryptedData]);
 
-    const filename = `${new Date().toISOString()}.txt`;
+    const timestamp = new Date(file.lastModified).toISOString();
+    const filename = `${timestamp}.txt`;
     const provider = getStorageProvider();
 
     // Process is atomic: uploadFile will throw if it fails.
