@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getFiles, decryptImage } from "../actions/files";
+import { getFiles } from "../actions/files";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@core/components/ui/button";
 import { Label } from "@core/components/ui/label";
 import { Input } from "@core/components/ui/input";
@@ -29,6 +30,16 @@ export default function VaultPage() {
       setLoading(false);
     }
     loadFiles();
+
+    // Cleanup Object URLs on unmount
+    return () => {
+      setDecryptedImages((prev) => {
+        Object.values(prev).forEach((url) => {
+          if (url.startsWith("blob:")) URL.revokeObjectURL(url);
+        });
+        return prev;
+      });
+    };
   }, []);
 
   async function handleDecryptAll() {
@@ -46,12 +57,35 @@ export default function VaultPage() {
     const newDecrypted: Record<string, string> = {};
     const failedFiles: string[] = [];
 
-    const results = await Promise.all(files.map((file) => decryptImage(file, password)));
+    const results = await Promise.all(
+      files.map(async (file) => {
+        try {
+          const response = await fetch("/api/decrypt", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ filename: file, password }),
+          });
+
+          if (!response.ok) return { success: false };
+
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          return { success: true, url };
+        } catch (error) {
+          console.error(`Error decrypting ${file}:`, error);
+          return { success: false };
+        }
+      })
+    );
 
     results.forEach((result, index) => {
       const file = files[index];
-      if (result.success && result.dataUrl) {
-        newDecrypted[file] = result.dataUrl as string;
+      if (result.success && result.url) {
+        // Revoke old URL if it exists
+        if (decryptedImages[file]?.startsWith("blob:")) {
+          URL.revokeObjectURL(decryptedImages[file]);
+        }
+        newDecrypted[file] = result.url;
       } else {
         failedFiles.push(file);
       }
@@ -140,11 +174,12 @@ export default function VaultPage() {
                   <div className="flex flex-col gap-4">
                     {decryptedImages[file] ? (
                       <div className="relative aspect-video overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                        <Image
                           src={decryptedImages[file]}
                           alt="Decrypted content"
-                          className="h-full w-full object-contain"
+                          fill
+                          className="object-contain"
+                          unoptimized
                         />
                       </div>
                     ) : (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NextImage from "next/image";
 import { Button } from "@core/components/ui/button";
 import { Input } from "@core/components/ui/input";
@@ -8,7 +8,7 @@ import { Label } from "@core/components/ui/label";
 import { Card, CardContent } from "@core/components/ui/card";
 import { Skeleton } from "@core/components/ui/skeleton";
 import { Lock } from "lucide-react";
-import { getGalleryFiles, decryptGalleryImage } from "@core/app/actions/gallery";
+import { getGalleryFiles } from "@core/app/actions/gallery";
 import { toast } from "sonner";
 
 interface ImageState {
@@ -26,6 +26,18 @@ export function GalleryView() {
   const [images, setImages] = useState<ImageState[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+
+  useEffect(() => {
+    // Cleanup Object URLs on unmount
+    return () => {
+      setImages((prev) => {
+        prev.forEach((img) => {
+          if (img.dataUrl?.startsWith("blob:")) URL.revokeObjectURL(img.dataUrl);
+        });
+        return prev;
+      });
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,21 +114,33 @@ export function GalleryView() {
       )
     );
 
-    const result = await decryptGalleryImage(pId, fileName, pass);
+    try {
+      const response = await fetch("/api/decrypt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: fileName, password: pass, projectId: pId }),
+      });
 
-    if (result.success && result.dataUrl) {
+      if (!response.ok) {
+        throw new Error("Failed to decrypt");
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
       setImages((prev) =>
         prev.map((img) =>
           img.name === fileName
-            ? { ...img, status: "loaded", dataUrl: result.dataUrl }
+            ? { ...img, status: "loaded", dataUrl: url }
             : img
         )
       );
-    } else {
+    } catch (error) {
+      console.error(`Error decrypting ${fileName}:`, error);
       setImages((prev) =>
         prev.map((img) =>
           img.name === fileName
-            ? { ...img, status: "error", error: result.error }
+            ? { ...img, status: "error", error: error instanceof Error ? error.message : "Error" }
             : img
         )
       );
