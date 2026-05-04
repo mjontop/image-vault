@@ -11,7 +11,7 @@ interface BatchUploadOptions {
 }
 
 export function useBatchUpload(options: BatchUploadOptions = {}) {
-  const { concurrency = 3, onProgress, onComplete, onError } = options;
+  const { concurrency = 2, onProgress, onComplete, onError } = options;
   const [isUploading, setIsUploading] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
   const abortControllerRef = useRef<AbortController | null>(null);

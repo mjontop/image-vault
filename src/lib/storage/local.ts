@@ -18,11 +18,14 @@ export class LocalStorageProvider implements StorageProvider {
     return await fs.readFile(path.join(this.storageDir, name));
   }
 
-  async listFiles(): Promise<string[]> {
+  async listFiles(page: number = 1, perPage: number = 100): Promise<string[]> {
     try {
       await fs.mkdir(this.storageDir, { recursive: true });
       const files = await fs.readdir(this.storageDir);
-      return files.filter((f) => f.endsWith(".txt")).reverse();
+      const allFiles = files.filter((f) => f.endsWith(".dat"));
+
+      const start = (page - 1) * perPage;
+      return allFiles.slice(start, start + perPage);
     } catch {
       return [];
     }

@@ -2,12 +2,16 @@
 import { LocalStorageProvider } from "./local";
 import { GitLabStorageProvider } from "./gitlab";
 
-export function getStorageProvider(): StorageProvider {
+export interface StorageConfig {
+  projectId?: string;
+}
+
+export function getStorageProvider(config?: StorageConfig): StorageProvider {
   const type = process.env.STORAGE_PROVIDER || "local";
 
   switch (type.toLowerCase()) {
     case "gitlab":
-      return new GitLabStorageProvider();
+      return new GitLabStorageProvider(config?.projectId);
     case "local":
     default:
       return new LocalStorageProvider();
