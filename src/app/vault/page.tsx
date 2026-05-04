@@ -116,9 +116,14 @@ export default function VaultPage() {
         <div>
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Secure Vault</h1>
         </div>
-        <Button asChild variant="outline">
-          <Link href="/">← Back to Encryptor</Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href="/">← Home</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/gallery">Gallery</Link>
+          </Button>
+        </div>
       </header>
 
       <main className="mx-auto w-full max-w-4xl">
