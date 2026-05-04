@@ -51,8 +51,8 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": mimeType,
         "Cache-Control": "no-store",
-        "Pragma": "no-cache",
-        "Expires": "0",
+        Pragma: "no-cache",
+        Expires: "0",
       },
     });
   } catch (error) {

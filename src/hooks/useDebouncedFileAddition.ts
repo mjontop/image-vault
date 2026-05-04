@@ -47,7 +47,7 @@ export function useDebouncedFileAddition(options: DebouncedFileAdditionOptions =
         return remaining;
       });
     },
-    [maxBatchSize]
+    [getFileKey, maxBatchSize]
   );
 
   const addFiles = useCallback(

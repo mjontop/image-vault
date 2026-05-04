@@ -51,10 +51,10 @@ export function GalleryView() {
     setImages([]);
     setPage(1);
 
-    await fetchPage(projectId, 1, password);
+    await fetchPage(projectId, 1);
   };
 
-  const fetchPage = async (pId: string, pageNum: number, pass: string) => {
+  const fetchPage = async (pId: string, pageNum: number) => {
     setIsFetchingList(true);
     const result = await getGalleryFiles(pId, pageNum);
 
@@ -97,7 +97,7 @@ export function GalleryView() {
   const loadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchPage(projectId, nextPage, password);
+    fetchPage(projectId, nextPage);
   };
 
   const processImage = async (pId: string, fileName: string, pass: string) => {
