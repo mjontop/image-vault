@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import path from "path";
 import { getStorageProvider } from "@core/lib/storage";
 
 export async function POST(req: NextRequest) {
@@ -8,6 +9,10 @@ export async function POST(req: NextRequest) {
 
     if (!filename || !password) {
       return NextResponse.json({ error: "Missing filename or password" }, { status: 400 });
+    }
+
+    if (filename.includes("/") || filename.includes("\\") || path.basename(filename) !== filename) {
+      return NextResponse.json({ error: "Invalid filename" }, { status: 400 });
     }
 
     const provider = getStorageProvider({ projectId });
@@ -45,7 +50,9 @@ export async function POST(req: NextRequest) {
     return new NextResponse(decrypted, {
       headers: {
         "Content-Type": mimeType,
-        "Cache-Control": "private, max-age=3600",
+        "Cache-Control": "no-store",
+        "Pragma": "no-cache",
+        "Expires": "0",
       },
     });
   } catch (error) {

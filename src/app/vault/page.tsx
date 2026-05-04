@@ -57,26 +57,33 @@ export default function VaultPage() {
     const newDecrypted: Record<string, string> = {};
     const failedFiles: string[] = [];
 
-    const results = await Promise.all(
-      files.map(async (file) => {
-        try {
-          const response = await fetch("/api/decrypt", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ filename: file, password }),
-          });
+    const results: { success: boolean; url?: string }[] = [];
+    const CONCURRENCY_LIMIT = 4;
 
-          if (!response.ok) return { success: false };
+    for (let i = 0; i < files.length; i += CONCURRENCY_LIMIT) {
+      const chunk = files.slice(i, i + CONCURRENCY_LIMIT);
+      const chunkResults = await Promise.all(
+        chunk.map(async (file) => {
+          try {
+            const response = await fetch("/api/decrypt", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ filename: file, password }),
+            });
 
-          const blob = await response.blob();
-          const url = URL.createObjectURL(blob);
-          return { success: true, url };
-        } catch (error) {
-          console.error(`Error decrypting ${file}:`, error);
-          return { success: false };
-        }
-      })
-    );
+            if (!response.ok) return { success: false };
+
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            return { success: true, url };
+          } catch (error) {
+            console.error(`Error decrypting ${file}:`, error);
+            return { success: false };
+          }
+        })
+      );
+      results.push(...chunkResults);
+    }
 
     results.forEach((result, index) => {
       const file = files[index];
