@@ -44,15 +44,24 @@ export function FileCard({ fileState, onRemove, isUploading }: FileCardProps) {
           </div>
         )}
         {(fileState.status === "error-upload" || fileState.status === "error-encrypt") && (
-          <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 backdrop-blur-[1px]">
-            <AlertCircle className="h-10 w-10 text-white drop-shadow-md" />
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center bg-red-500/20 p-2 backdrop-blur-[1px]"
+            title={fileState.error}
+          >
+            <AlertCircle className="mb-1 h-10 w-10 text-white drop-shadow-md" />
+            <span className="line-clamp-2 text-center text-[8px] font-bold text-white uppercase drop-shadow-sm">
+              {fileState.error ||
+                (fileState.status === "error-encrypt" ? "Encryption Failed" : "Upload Failed")}
+            </span>
           </div>
         )}
         {(fileState.status === "uploading" || fileState.status === "encrypting") && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 p-4">
             <Loader2 className="mb-2 h-8 w-8 animate-spin text-white" />
             <span className="text-[10px] font-bold tracking-wider text-white uppercase">
-              {fileState.status === "uploading" ? `${fileState.progress}%` : "Encrypting"}
+              {fileState.status === "uploading"
+                ? `Uploading ${fileState.progress}%`
+                : "Encrypting..."}
             </span>
           </div>
         )}

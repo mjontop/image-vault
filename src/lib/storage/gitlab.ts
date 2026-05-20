@@ -29,6 +29,41 @@ export class GitLabStorageProvider implements StorageProvider {
     const filePath = encodeURIComponent(name);
     const url = `${this.baseUrl}/api/v4/projects/${this.projectId}/repository/files/${filePath}`;
 
+    const formData = new FormData();
+    formData.append("branch", this.branch);
+    formData.append("author_email", "automationbot@image-vault.com");
+    formData.append("author_name", "Automation Image vault (bot)");
+    formData.append("commit_message", `Add encrypted file: ${name}`);
+
+    const blob = new Blob([new Uint8Array(content)]);
+    formData.append("content", blob);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "PRIVATE-TOKEN": this.token,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`GitLab upload failed: ${response.statusText} - ${error}`);
+    }
+  }
+
+  async uploadFiles(files: { name: string; content: Buffer }[]): Promise<void> {
+    if (files.length === 0) return;
+
+    const url = `${this.baseUrl}/api/v4/projects/${this.projectId}/repository/commits`;
+
+    const actions = files.map((file) => ({
+      action: "create",
+      file_path: file.name,
+      content: file.content.toString("base64"),
+      encoding: "base64",
+    }));
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -37,17 +72,14 @@ export class GitLabStorageProvider implements StorageProvider {
       },
       body: JSON.stringify({
         branch: this.branch,
-        author_email: "automationbot@image-vault.com",
-        author_name: "Automation Image vault (bot)",
-        content: content.toString("base64"),
-        commit_message: `Add encrypted file: ${name}`,
-        encoding: "base64",
+        commit_message: `Add ${files.length} encrypted files`,
+        actions,
       }),
     });
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`GitLab upload failed: ${response.statusText} - ${error}`);
+      throw new Error(`GitLab batch upload failed: ${response.statusText} - ${error}`);
     }
   }
 
