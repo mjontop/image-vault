@@ -14,6 +14,13 @@ export class LocalStorageProvider implements StorageProvider {
     await fs.writeFile(path.join(this.storageDir, name), content);
   }
 
+  async uploadFiles(files: { name: string; content: Buffer }[]): Promise<void> {
+    await fs.mkdir(this.storageDir, { recursive: true });
+    await Promise.all(
+      files.map((file) => fs.writeFile(path.join(this.storageDir, file.name), file.content))
+    );
+  }
+
   async getFile(name: string): Promise<Buffer> {
     return await fs.readFile(path.join(this.storageDir, name));
   }

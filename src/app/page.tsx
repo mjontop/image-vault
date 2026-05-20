@@ -29,13 +29,9 @@ export default function Home() {
   // Use batch upload with concurrency control
   const { uploadBatch, isUploading } = useBatchUpload({
     concurrency: 3, // Upload 3 files at a time
-    onProgress: (fileId, progress) => {
+    onProgress: (fileId, progress, status) => {
       setFiles((prev) =>
-        prev.map((f) =>
-          f.id === fileId
-            ? { ...f, progress, status: progress < 100 ? "uploading" : "encrypting" }
-            : f
-        )
+        prev.map((f) => (f.id === fileId ? { ...f, progress, status: status || f.status } : f))
       );
     },
     onComplete: (fileId) => {
@@ -43,19 +39,19 @@ export default function Home() {
         prev.map((f) => (f.id === fileId ? { ...f, progress: 100, status: "completed" } : f))
       );
     },
-    onError: (fileId, error) => {
+    onError: (fileId, error, status) => {
       setFiles((prev) =>
-        prev.map((f) => (f.id === fileId ? { ...f, status: "error-encrypt", error } : f))
+        prev.map((f) => (f.id === fileId ? { ...f, status: status || "error-encrypt", error } : f))
       );
     },
   });
 
   const stats: Stats = useMemo(() => {
     const total = files.length;
-    const uploaded = files.filter((f) =>
-      ["encrypting", "completed", "error-encrypt"].includes(f.status)
+    const uploaded = files.filter((f) => f.status === "completed").length;
+    const encrypted = files.filter((f) =>
+      ["encrypting", "uploading", "completed", "error-upload"].includes(f.status)
     ).length;
-    const encrypted = files.filter((f) => f.status === "completed").length;
     const failedUpload = files.filter((f) => f.status === "error-upload").length;
     const failedEncrypt = files.filter((f) => f.status === "error-encrypt").length;
     const overallProgress =

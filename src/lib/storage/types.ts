@@ -5,6 +5,7 @@
 
 export interface StorageProvider {
   uploadFile(name: string, content: Buffer): Promise<void>;
+  uploadFiles(files: StorageFile[]): Promise<void>;
   getFile(name: string): Promise<Buffer>;
   listFiles(page?: number, perPage?: number): Promise<string[]>;
   deleteFile(name: string): Promise<void>;
